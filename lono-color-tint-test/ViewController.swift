@@ -94,7 +94,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     @IBAction func btn2OnClick(_ sender: Any) {
      
         // Load the input image
-        let inputImage = UIImage(named: "pic")! // Replace with your own image
+        let inputImage = imgView.image! // Replace with your own image
 
         // Create a CIImage from the input image
         guard let ciImage = CIImage(image: inputImage) else { return }

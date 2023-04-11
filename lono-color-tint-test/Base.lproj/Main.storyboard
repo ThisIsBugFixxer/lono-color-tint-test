@@ -24,19 +24,19 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kR2-jA-sJR">
-                                <rect key="frame" x="159" y="560" width="75" height="35"/>
+                                <rect key="frame" x="126" y="560" width="143" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="green tint test 1"/>
                                 <connections>
                                     <action selector="btnOnClick:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Ue7-pV-qF3"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eQl-43-tFI">
-                                <rect key="frame" x="159" y="625" width="75" height="35"/>
+                                <rect key="frame" x="124" y="625" width="145" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="green tint test 2"/>
                                 <connections>
                                     <action selector="btn2OnClick:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Ug7-GW-fdo"/>
                                 </connections>
