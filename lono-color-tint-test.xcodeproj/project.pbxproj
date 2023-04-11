@@ -13,6 +13,8 @@
 		5FDBEFDA29E5805F00C3B2F0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5FDBEFD829E5805F00C3B2F0 /* Main.storyboard */; };
 		5FDBEFDC29E5805F00C3B2F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5FDBEFDB29E5805F00C3B2F0 /* Assets.xcassets */; };
 		5FDBEFDF29E5805F00C3B2F0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5FDBEFDD29E5805F00C3B2F0 /* LaunchScreen.storyboard */; };
+		5FDBEFE729E5810000C3B2F0 /* reinhardColorTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDBEFE629E5810000C3B2F0 /* reinhardColorTransfer.swift */; };
+		5FDBEFEA29E5816100C3B2F0 /* CIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDBEFE929E5816100C3B2F0 /* CIImage+Extension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +26,8 @@
 		5FDBEFDB29E5805F00C3B2F0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5FDBEFDE29E5805F00C3B2F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5FDBEFE029E5805F00C3B2F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5FDBEFE629E5810000C3B2F0 /* reinhardColorTransfer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = reinhardColorTransfer.swift; sourceTree = "<group>"; };
+		5FDBEFE929E5816100C3B2F0 /* CIImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CIImage+Extension.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +63,8 @@
 				5FDBEFD229E5805F00C3B2F0 /* AppDelegate.swift */,
 				5FDBEFD429E5805F00C3B2F0 /* SceneDelegate.swift */,
 				5FDBEFD629E5805F00C3B2F0 /* ViewController.swift */,
+				5FDBEFE629E5810000C3B2F0 /* reinhardColorTransfer.swift */,
+				5FDBEFE929E5816100C3B2F0 /* CIImage+Extension.swift */,
 				5FDBEFD829E5805F00C3B2F0 /* Main.storyboard */,
 				5FDBEFDB29E5805F00C3B2F0 /* Assets.xcassets */,
 				5FDBEFDD29E5805F00C3B2F0 /* LaunchScreen.storyboard */,
@@ -140,7 +146,9 @@
 			files = (
 				5FDBEFD729E5805F00C3B2F0 /* ViewController.swift in Sources */,
 				5FDBEFD329E5805F00C3B2F0 /* AppDelegate.swift in Sources */,
+				5FDBEFEA29E5816100C3B2F0 /* CIImage+Extension.swift in Sources */,
 				5FDBEFD529E5805F00C3B2F0 /* SceneDelegate.swift in Sources */,
+				5FDBEFE729E5810000C3B2F0 /* reinhardColorTransfer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
