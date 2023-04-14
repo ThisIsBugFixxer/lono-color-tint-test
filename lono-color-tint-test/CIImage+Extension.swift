@@ -5,114 +5,61 @@
 ////  Created by Priyam Mehta on 11/04/23.
 ////
 //
-//import Foundation
-//import CoreImage
-//
-//extension CIImage {
-//    func getRGBHistogram() -> (red: [UInt], green: [UInt], blue: [UInt]) {
-//        let histogramSize = 256
-//        var histogramR = [UInt](repeating: 0, count: histogramSize)
-//        var histogramG = [UInt](repeating: 0, count: histogramSize)
-//        var histogramB = [UInt](repeating: 0, count: histogramSize)
-//
-//        let context = CIContext(options: nil)
-//        if let cgImage = context.createCGImage(self, from: self.extent) {
-//            let imageData = cgImage.dataProvider?.data
-//            if let data = imageData {
-//                let mutableData = CFDataCreateMutableCopy(nil, 0, data)
-//                    let buffer = CFDataGetMutableBytePtr(mutableData)
-//                    let count = CFDataGetLength(mutableData)
-//                if let buffer = buffer {
-//                        for i in 0..<count {
-//                            let value = buffer[i]
-//                            // Perform operations on the value, e.g. histogram calculation, color transfer, etc.
-//                        }
-//                    }
-//
-////                let pixelBuffer = buffer.baseAddress!.assumingMemoryBound(to: UInt32.self)
-//                let pixelCount = count / MemoryLayout<UInt32>.size
-//
-//                for i in 0..<pixelCount {
-//                    let pixel = pixelBuffer[i]
-//                    let r = UInt8((pixel >> 16) & 0xff)
-//                    let g = UInt8((pixel >> 8) & 0xff)
-//                    let b = UInt8(pixel & 0xff)
-//                    histogramR[Int(r)] += 1
-//                    histogramG[Int(g)] += 1
-//                    histogramB[Int(b)] += 1
-//                }
-//            }
-//        }
-//
-//        return (histogramR, histogramG, histogramB)
-//    }
-//
-//    func mean() -> (red: Float, green: Float, blue: Float) {
-//        let histogram = self.getRGBHistogram()
-//        let pixelCount = self.extent.width * self.extent.height
-//        let sumR = histogram.red.enumerated().reduce(0) { $0 + Float($1.offset) * Float($1.element) }
-//        let sumG = histogram.green.enumerated().reduce(0) { $0 + Float($1.offset) * Float($1.element) }
-//        let sumB = histogram.blue.enumerated().reduce(0) { $0 + Float($1.offset) * Float($1.element) }
-//        let meanR = sumR / Float(pixelCount)
-//        let meanG = sumG / Float(pixelCount)
-//        let meanB = sumB / Float(pixelCount)
-//        return (meanR, meanG, meanB)
-//    }
-//
-//    func standardDeviation() -> (red: Float, green: Float, blue: Float) {
-//        let histogram = self.getRGBHistogram()
-//        let pixelCount = self.extent.width * self.extent.height
-//        let mean = self.mean()
-//        let sumR = histogram.red.enumerated().reduce(0) { $0 + Float($1.offset) * Float($1.offset) * Float($1.element) }
-//        let sumG = histogram.green.enumerated().reduce(0) { $0 + Float($1.offset) * Float($1.offset) * Float($1.element) }
-//        let sumB = histogram.blue.enumerated().reduce(0) { $0 + Float($1.offset) * Float($1.offset) * Float($1.element) }
-//        let varianceR = (sumR / Float(pixelCount)) - (mean.red * mean.red)
-//        let varianceG = (sumG / Float(pixelCount)) - (mean.green * mean.green)
-//        let varianceB = (sumB / Float(pixelCount)) - (mean.blue * mean.blue)
-//        let stdDevR = sqrt(max(0, varianceR))
-//        let stdDevG = sqrt(max(0, varianceG))
-//        let stdDevB = sqrt(max(0, varianceB))
-//        return (stdDevR, stdDevG, stdDevB)
-//    }
-//}
-//
-//func colorTransfer(sourceImage: CIImage, targetImage: CIImage) -> CIImage? {
-//    let sourceMean = sourceImage.mean()
-//    let sourceStdDev = sourceImage.standardDeviation()
-//    let targetMean = targetImage.mean()
-//    let targetStdDev = targetImage.standardDeviation()
-//
-//    guard let sourceRgbFilter = CIFilter(name: "CIColorMatrix"),
-//          let targetRgbFilter = CIFilter(name: "CIColorMatrix") else {
-//        return nil
-//    }
-//
-//    sourceRgbFilter.setValue(sourceMean.red - targetMean.red, forKey: "inputBiasR")
-//    sourceRgbFilter.setValue(sourceMean.green - targetMean.green, forKey: "inputBiasG")
-//    sourceRgbFilter.setValue(sourceMean.blue - targetMean.blue, forKey: "inputBiasB")
-//    sourceRgbFilter.setValue(sourceStdDev.red / targetStdDev.red, forKey: "inputScaleR")
-//    sourceRgbFilter.setValue(sourceStdDev.green / targetStdDev.green, forKey: "inputScaleG")
-//    sourceRgbFilter.setValue(sourceStdDev.blue / targetStdDev.blue, forKey: "inputScaleB")
-//
-//    targetRgbFilter.setValue(targetMean.red, forKey: "inputBiasR")
-//    targetRgbFilter.setValue(targetMean.green, forKey: "inputBiasG")
-//    targetRgbFilter.setValue(targetMean.blue, forKey: "inputBiasB")
-//    targetRgbFilter.setValue(targetStdDev.red, forKey: "inputScaleR")
-//    targetRgbFilter.setValue(targetStdDev.green, forKey: "inputScaleG")
-//    targetRgbFilter.setValue(targetStdDev.blue, forKey: "inputScaleB")
-//
-//    let sourceRgbOutput = sourceRgbFilter.outputImage?.cropped(to: sourceImage.extent)
-//    let targetRgbOutput = targetRgbFilter.outputImage?.cropped(to: targetImage.extent)
-//
-//    guard let sourceRgb = sourceRgbOutput, let targetRgb = targetRgbOutput else {
-//        return nil
-//    }
-//
-//    let combinedFilter = CIFilter(name: "CISourceOverCompositing")
-//    combinedFilter?.setValue(sourceRgb, forKey: "inputImage")
-//    combinedFilter?.setValue(targetRgb, forKey: "inputBackgroundImage")
-//
-//    let outputImage = combinedFilter?.outputImage?.cropped(to: sourceImage.extent)
-//
-//    return outputImage
-//}
+import Foundation
+import CoreImage
+
+extension CGImage {
+    func applyingReinhardColorTransfer(withSourceLUTData sourceLUTData: NSData, targetLUTData: NSData, lutDimension: Int) -> CGImage? {
+        // Create a CIImage from the source CGImage
+        let sourceCIImage = CIImage(cgImage: self)
+
+        // Create a CIFilter for CIColorCube
+        let sourceColorCubeFilter = CIFilter(name: "CIColorCube")!
+        sourceColorCubeFilter.setValue(sourceCIImage, forKey: kCIInputImageKey)
+        sourceColorCubeFilter.setValue(sourceLUTData, forKey: "inputCubeData")
+        sourceColorCubeFilter.setValue(lutDimension, forKey: "inputCubeDimension")
+
+        // Apply the source colorCubeFilter to get the output CIImage
+        guard let sourceOutputImage = sourceColorCubeFilter.outputImage else {
+            print("Failed to get outputImage from sourceColorCubeFilter")
+            return nil
+        }
+
+        // Create a CIImage from the target LUT data
+        let targetCIImage = CIImage(bitmapData: targetLUTData as Data, bytesPerRow: lutDimension * 4 * MemoryLayout<Float>.size, size: CGSize(width: lutDimension * lutDimension, height: lutDimension), format: .RGBA8, colorSpace: CGColorSpaceCreateDeviceRGB())
+
+        // Create a CIFilter for CIColorCube
+        let targetColorCubeFilter = CIFilter(name: "CIColorCube")!
+        targetColorCubeFilter.setValue(targetCIImage, forKey: "inputCubeData")
+        targetColorCubeFilter.setValue(lutDimension, forKey: "inputCubeDimension")
+
+        // Apply the target colorCubeFilter to get the output CIImage
+        guard let targetOutputImage = targetColorCubeFilter.outputImage else {
+            print("Failed to get outputImage from targetColorCubeFilter")
+            return nil
+        }
+
+        // Create a CIFilter for CISourceOverCompositing
+        let compositingFilter = CIFilter(name: "CISourceOverCompositing")!
+        compositingFilter.setValue(sourceOutputImage, forKey: kCIInputImageKey)
+        compositingFilter.setValue(targetOutputImage, forKey: kCIInputBackgroundImageKey)
+
+        // Apply the compositing filter to get the output CIImage
+        guard let compositingOutputImage = compositingFilter.outputImage else {
+            print("Failed to get outputImage from compositingFilter")
+            return nil
+        }
+
+        // Create a CIContext for rendering the output CIImage
+        let ciContext = CIContext(options: nil)
+
+        // Render the output CIImage to a CGImage
+        guard let outputCGImage = ciContext.createCGImage(compositingOutputImage, from: compositingOutputImage.extent) else {
+            print("Failed to create CGImage from outputImage")
+            return nil
+        }
+
+        // Return the resulting CGImage
+        return outputCGImage
+    }
+}

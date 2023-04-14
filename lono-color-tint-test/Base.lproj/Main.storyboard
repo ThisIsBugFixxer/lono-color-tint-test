@@ -4,6 +4,7 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -63,6 +64,17 @@
                                     <action selector="btn3OnClick:" destination="BYZ-38-t0r" eventType="touchUpInside" id="2ye-lg-KtF"/>
                                 </connections>
                             </button>
+                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="8mH-eb-NoR">
+                                <rect key="frame" x="148" y="755" width="97" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="16" minValue="2" maxValue="64" translatesAutoresizingMaskIntoConstraints="NO" id="Kwv-6C-Sfg">
+                                <rect key="frame" x="67" y="797" width="274" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" systemColor="systemPurpleColor"/>
+                            </slider>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -71,9 +83,12 @@
                         <outlet property="btn" destination="kR2-jA-sJR" id="Gm8-w4-H2R"/>
                         <outlet property="btn2" destination="eQl-43-tFI" id="IGn-vC-Eld"/>
                         <outlet property="btn3" destination="F4W-Ww-riV" id="HYM-9X-FqC"/>
+                        <outlet property="btn4" destination="Ber-TS-9IL" id="T3f-nS-7Ew"/>
                         <outlet property="img3view" destination="ckw-C7-rJx" id="WOE-zM-Ud0"/>
                         <outlet property="imgView" destination="eQU-MJ-BSs" id="oOu-wQ-NFJ"/>
+                        <outlet property="inputLbl" destination="8mH-eb-NoR" id="SGu-9V-0TW"/>
                         <outlet property="opImgView" destination="BiN-58-doL" id="SSK-cQ-Rgk"/>
+                        <outlet property="valueSlider" destination="Kwv-6C-Sfg" id="NUC-3t-JQu"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -81,4 +96,9 @@
             <point key="canvasLocation" x="52.671755725190835" y="3.5211267605633805"/>
         </scene>
     </scenes>
+    <resources>
+        <systemColor name="systemPurpleColor">
+            <color red="0.68627450980392157" green="0.32156862745098042" blue="0.87058823529411766" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
 </document>

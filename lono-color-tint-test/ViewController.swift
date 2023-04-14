@@ -14,10 +14,15 @@ import AVKit
 import PhotosUI
 
 
-class ViewController: UIViewController, PHPickerViewControllerDelegate {
+class ViewController: UIViewController, PHPickerViewControllerDelegate, UITextFieldDelegate {
     
     var selectedImages: [UIImage] = []
+    
+    @IBOutlet weak var valueSlider: UISlider!
+    @IBOutlet weak var inputLbl: UITextField!
+    
 
+    @IBOutlet weak var btn4: UIButton!
     @IBOutlet weak var img3view: UIImageView!
     @IBOutlet weak var btn3: UIButton!
     @IBOutlet weak var btn2: UIButton!
@@ -27,8 +32,25 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        imgView.image = UIImage(named: "pic2")
+        valueSlider.minimumValue = 2
+        valueSlider.maximumValue = 64
+        valueSlider.isContinuous = true
+        valueSlider.addTarget(self, action: #selector(sliderValueChanged), for: .valueChanged)
+        inputLbl.keyboardType = .numberPad
+        inputLbl.delegate = self
+        imgView.image = UIImage(named: "pic7")
     }
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+            textField.resignFirstResponder()
+            return true
+        }
+    @objc func sliderValueChanged() {
+            let value = Int(valueSlider.value)
+        btn4.setTitle("\(value)", for: .normal)
+        
+        lutColorTransfer()
+        
+        }
     
     
     @IBAction func btnOnClick(_ sender: Any) {
@@ -166,11 +188,13 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     
     @IBAction func btn3OnClick(_ sender: Any) {
         
-        selectedImages = []
+        if selectedImages.count == 2 {
+            selectedImages = []
+        }
         
         var configuration = PHPickerConfiguration()
                configuration.filter = .images
-               configuration.selectionLimit = 2 // set to 0 for unlimited selection
+               configuration.selectionLimit = 1 // set to 0 for unlimited selection
                
                let picker = PHPickerViewController(configuration: configuration)
                picker.delegate = self
@@ -200,7 +224,349 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
            dismiss(animated: true, completion: nil)
        }
     @IBAction func btn4OnClick(_ sender: Any) {
-        colorTransfer()
+//        colorTransfer()
+        
+//      lutColorTransfer()
+        
+//        reinhardLutColortransfer()
+        
+        lutColorTransferReinEasy()
+        
+        
+
+       
+
+
+    }
+    
+    func lutColorTransferReinEasy() {
+        /////////////////////////////  SOURCE IMAGE
+        // Load the image from a UIImage or a file URL
+        let image = convertRGBToLAB(selectedImages[0])!
+
+        // Get the CGImage from the UIImage
+        guard let cgImage = image.cgImage else {
+            print("Failed to get CGImage from image")
+            return
+        }
+
+        // Get the size of the image
+        let width = cgImage.width
+        let height = cgImage.height
+
+        // Create an empty array to store the LUT
+        
+        let lutDimens = 64 //Int(valueSlider.value)// Int(inputLbl.text!)!
+        btn4.setTitle("\(lutDimens)", for: .normal)
+        var lut = [Float](repeating: 0, count: lutDimens * lutDimens * lutDimens * 4)
+
+        // Extract the color data from the image
+        guard let imageData = cgImage.dataProvider?.data else {
+            print("Failed to get image data")
+            return
+        }
+
+        let data = CFDataGetBytePtr(imageData)
+
+        // Populate the LUT with color values
+        for i in 0..<lutDimens {
+            for j in 0..<lutDimens {
+                for k in 0..<lutDimens {
+                    let index = (i * lutDimens * lutDimens) + (j * lutDimens) + k
+                    lut[index * 4] = Float(data![index * 4]) / 255.0  // Red channel
+                    lut[index * 4 + 1] = Float(data![index * 4 + 1]) / 255.0  // Green channel
+                    lut[index * 4 + 2] = Float(data![index * 4 + 2]) / 255.0  // Blue channel
+                    lut[index * 4 + 3] = 1.0  // Alpha channel
+                }
+            }
+        }
+
+        // Convert the lut array to NSData
+        let lutData = NSData(bytes: lut, length: lut.count * MemoryLayout<Float>.size)
+
+        //////////////////// TARGET IMAGE
+        let inputImage = CIImage(image: convertRGBToLAB(selectedImages[1])!)!
+        
+        guard let cgImageip = inputImage.cgImage else {
+            print("Failed to get CGImage from image")
+            return
+        }
+
+        // Get the size of the image
+        let widthip = cgImageip.width
+        let heightip = cgImageip.height
+
+        // Create an empty array to store the LUT
+        
+        
+        btn4.setTitle("\(lutDimens)", for: .normal)
+        var lutip = [Float](repeating: 0, count: lutDimens * lutDimens * lutDimens * 4)
+
+        // Extract the color data from the image
+        guard let imageDataip = cgImageip.dataProvider?.data else {
+            print("Failed to get image data")
+            return
+        }
+
+        let dataip = CFDataGetBytePtr(imageDataip)
+
+        // Populate the LUT with color values
+        for i in 0..<lutDimens {
+            for j in 0..<lutDimens {
+                for k in 0..<lutDimens {
+                    let index = (i * lutDimens * lutDimens) + (j * lutDimens) + k
+                    lutip[index * 4] = Float(dataip![index * 4]) / 255.0  // Red channel
+                    lutip[index * 4 + 1] = Float(dataip![index * 4 + 1]) / 255.0  // Green channel
+                    lutip[index * 4 + 2] = Float(dataip![index * 4 + 2]) / 255.0  // Blue channel
+                    lutip[index * 4 + 3] = 1.0  // Alpha channel
+                }
+            }
+        }
+
+        // Convert the lut array to NSData
+        let lutDataip = NSData(bytes: lutip, length: lutip.count * MemoryLayout<Float>.size)
+        print("=== \(lutip.count) and  \(lutDataip.count) ====")
+        /////////////////// OTHER PROCESSING
+        ///
+        let data1 = Data(referencing: lutData)
+        let data2 = Data(referencing: lutDataip)
+        
+        // Convert the Data objects to arrays of Float values
+        var lutArray1 = [Float](repeating: 0.0, count: data1.count / MemoryLayout<Float>.size)
+        var lutArray2 = [Float](repeating: 0.0, count: data2.count / MemoryLayout<Float>.size)
+        
+        // Convert the Data objects to arrays of Float values
+        data1.withUnsafeBytes { (rawBufferPointer: UnsafeRawBufferPointer) -> Void in
+            let floatBufferPointer = rawBufferPointer.bindMemory(to: Float.self)
+            let bufferPointer = UnsafeBufferPointer(start: floatBufferPointer.baseAddress, count: floatBufferPointer.count)
+            lutArray1 = Array(bufferPointer)
+        }
+
+        data2.withUnsafeBytes { (rawBufferPointer: UnsafeRawBufferPointer) -> Void in
+            let floatBufferPointer = rawBufferPointer.bindMemory(to: Float.self)
+            let bufferPointer = UnsafeBufferPointer(start: floatBufferPointer.baseAddress, count: floatBufferPointer.count)
+            lutArray2 = Array(bufferPointer)
+        }
+
+        // Perform color transfer by applying the values of LUT 1 onto LUT 2
+        var transferredLutArray: [Float] = []
+        let count = min(lutArray1.count, lutArray2.count)
+        
+        let s = get_mean_and_std(lutData: lutData)
+        let t = get_mean_and_std(lutData: lutDataip)
+        let s_mean = s.0
+        let s_std = s.1
+        let t_mean = t.0
+        let t_std = t.1
+        
+        print("=== \(s) and \(s.0) and count = \(count)")
+
+        for i in 0..<count {
+            transferredLutArray.append(lutArray1[i])
+        }
+        
+        var lutop = [Float](repeating: 0, count: lutDimens * lutDimens * lutDimens * 4)
+
+        // Extract the color data from the image
+        guard let imageDataop = cgImageip.dataProvider?.data else {
+            print("Failed to get image data")
+            return
+        }
+
+        let dataop = CFDataGetBytePtr(imageDataop)
+        
+        // Populate the LUT with color values
+        for i in 0..<lutDimens {
+            for j in 0..<lutDimens {
+                for k in 0..<lutDimens {
+                    let index = (i * lutDimens * lutDimens) + (j * lutDimens) + k
+                    lutop[index * 4] = (((Float(dataop![index * 4]) / 255.0)-s_mean[0])*(t_std[0]/s_std[0]))+t_mean[0]  // Red channel
+                    lutop[index * 4 + 1] = (((Float(dataop![index * 4 + 1]) / 255.0)-s_mean[1])*(t_std[1]/s_std[1]))+t_mean[1]  // Green channel
+                    lutop[index * 4 + 2] = (((Float(dataop![index * 4 + 2]) / 255.0)-s_mean[2])*(t_std[2]/s_std[2]))+t_mean[2]  // Blue channel
+                    lutop[index * 4 + 3] = 1.0  // Alpha channel
+                }
+            }
+        }
+
+        // Convert the lut array to NSData
+         let lutDataop = NSData(bytes: lutop, length: lutop.count * MemoryLayout<Float>.size)
+        print("=== \(lutop.count) and  \(lutDataop.count) ====")
+
+        // Convert the transferred Float array back to Data object
+        let transferredLutData = Data(buffer: UnsafeBufferPointer(start: &transferredLutArray, count: transferredLutArray.count))
+        
+        let transferredLutNSData = NSData(data: transferredLutData)
+        
+//        // Create a CIImage from the CGImage
+//        let inputImage = CIImage(image: selectedImages[1])
+
+        // Create a CIFilter for CIColorCube
+        let colorCubeFilter = CIFilter(name: "CIColorCube")!
+        colorCubeFilter.setValue(inputImage, forKey: kCIInputImageKey)
+        colorCubeFilter.setValue(lutDataop, forKey: "inputCubeData")
+        colorCubeFilter.setValue(lutDimens, forKey: "inputCubeDimension")
+
+        // Apply the colorCubeFilter to get the output CIImage
+        guard let outputImage = colorCubeFilter.outputImage else {
+            print("Failed to get outputImage from colorCubeFilter")
+            return
+        }
+
+        // Create a CIContext for rendering the output CIImage
+        let ciContext = CIContext(options: nil)
+
+        // Render the output CIImage to a CGImage
+        guard let outputCGImage = ciContext.createCGImage(outputImage, from: outputImage.extent) else {
+            print("Failed to create CGImage from outputImage")
+            return
+        }
+
+        // Convert the CGImage to a UIImage
+        let outputUIImage = UIImage(cgImage: outputCGImage)
+
+        // You can now use the outputUIImage as needed, such as displaying it in an image view or saving it to a file.
+
+        // Display or save the extracted LUT channels image as needed
+        opImgView.image = outputUIImage
+    }
+    
+    func reinhardLutColortransfer() {
+        let sourceImage = selectedImages[0]
+        let targetImage = selectedImages[1]
+
+        // Get the CGImages from the UIImages
+        guard let sourceCGImage = sourceImage.cgImage, let targetCGImage = targetImage.cgImage else {
+            print("Failed to get CGImage from image")
+            return
+        }
+
+        // Get the size of the images
+        let width = sourceCGImage.width
+        let height = sourceCGImage.height
+
+        // Create LUTs for source and target images
+        let lutDimens = 64
+        var sourceLUT = [Float](repeating: 0, count: lutDimens * lutDimens * lutDimens * 4)
+        var targetLUT = [Float](repeating: 0, count: lutDimens * lutDimens * lutDimens * 4)
+
+        // Extract color data from the source and target images
+        guard let sourceImageData = sourceCGImage.dataProvider?.data, let targetImageData = targetCGImage.dataProvider?.data else {
+            print("Failed to get image data")
+            return
+        }
+
+        let sourceData = CFDataGetBytePtr(sourceImageData)
+        let targetData = CFDataGetBytePtr(targetImageData)
+
+        // Populate the source and target LUTs with color values
+        for i in 0..<lutDimens {
+            for j in 0..<lutDimens {
+                for k in 0..<lutDimens {
+                    let index = (i * lutDimens * lutDimens) + (j * lutDimens) + k
+                    sourceLUT[index * 4] = Float(sourceData![index * 4]) / 255.0  // Red channel
+                    sourceLUT[index * 4 + 1] = Float(sourceData![index * 4 + 1]) / 255.0  // Green channel
+                    sourceLUT[index * 4 + 2] = Float(sourceData![index * 4 + 2]) / 255.0  // Blue channel
+                    sourceLUT[index * 4 + 3] = 1.0  // Alpha channel
+
+                    targetLUT[index * 4] = Float(targetData![index * 4]) / 255.0  // Red channel
+                    targetLUT[index * 4 + 1] = Float(targetData![index * 4 + 1]) / 255.0  // Green channel
+                    targetLUT[index * 4 + 2] = Float(targetData![index * 4 + 2]) / 255.0  // Blue channel
+                    targetLUT[index * 4 + 3] = 1.0  // Alpha channel
+                }
+            }
+        }
+
+        // Convert the LUTs to NSData
+        let sourceLUTData = NSData(bytes: sourceLUT, length: sourceLUT.count * MemoryLayout<Float>.size)
+        let targetLUTData = NSData(bytes: targetLUT, length: targetLUT.count * MemoryLayout<Float>.size)
+
+        // Perform Reinhard color transfer
+        let sourceCGImageWithLUT = sourceCGImage.applyingReinhardColorTransfer(withSourceLUTData: sourceLUTData, targetLUTData: targetLUTData, lutDimension: lutDimens)
+
+        // Convert the resulting CGImage to UIImage
+        let resultImage = UIImage(cgImage: sourceCGImageWithLUT!)
+
+        // Update the UI with the resulting image
+        opImgView.image = resultImage
+
+    }
+    
+    func lutColorTransfer() {
+        // Load the image from a UIImage or a file URL
+        let image = selectedImages[0]
+
+        // Get the CGImage from the UIImage
+        guard let cgImage = image.cgImage else {
+            print("Failed to get CGImage from image")
+            return
+        }
+
+        // Get the size of the image
+        let width = cgImage.width
+        let height = cgImage.height
+
+        // Create an empty array to store the LUT
+        
+        let lutDimens =  Int(valueSlider.value)// Int(inputLbl.text!)!
+        btn4.setTitle("\(lutDimens)", for: .normal)
+        var lut = [Float](repeating: 0, count: lutDimens * lutDimens * lutDimens * 4)
+
+        // Extract the color data from the image
+        guard let imageData = cgImage.dataProvider?.data else {
+            print("Failed to get image data")
+            return
+        }
+
+        let data = CFDataGetBytePtr(imageData)
+
+        // Populate the LUT with color values
+        for i in 0..<lutDimens {
+            for j in 0..<lutDimens {
+                for k in 0..<lutDimens {
+                    let index = (i * lutDimens * lutDimens) + (j * lutDimens) + k
+                    lut[index * 4] = Float(data![index * 4]) / 255.0  // Red channel
+                    lut[index * 4 + 1] = Float(data![index * 4 + 1]) / 255.0  // Green channel
+                    lut[index * 4 + 2] = Float(data![index * 4 + 2]) / 255.0  // Blue channel
+                    lut[index * 4 + 3] = 1.0  // Alpha channel
+                }
+            }
+        }
+
+        // Convert the lut array to NSData
+        let lutData = NSData(bytes: lut, length: lut.count * MemoryLayout<Float>.size)
+
+
+        // Create a CIImage from the CGImage
+        let inputImage = CIImage(image: selectedImages[1])
+
+        // Create a CIFilter for CIColorCube
+        let colorCubeFilter = CIFilter(name: "CIColorCube")!
+        colorCubeFilter.setValue(inputImage, forKey: kCIInputImageKey)
+        colorCubeFilter.setValue(lutData, forKey: "inputCubeData")
+        colorCubeFilter.setValue(lutDimens, forKey: "inputCubeDimension")
+
+        // Apply the colorCubeFilter to get the output CIImage
+        guard let outputImage = colorCubeFilter.outputImage else {
+            print("Failed to get outputImage from colorCubeFilter")
+            return
+        }
+
+        // Create a CIContext for rendering the output CIImage
+        let ciContext = CIContext(options: nil)
+
+        // Render the output CIImage to a CGImage
+        guard let outputCGImage = ciContext.createCGImage(outputImage, from: outputImage.extent) else {
+            print("Failed to create CGImage from outputImage")
+            return
+        }
+
+        // Convert the CGImage to a UIImage
+        let outputUIImage = UIImage(cgImage: outputCGImage)
+
+        // You can now use the outputUIImage as needed, such as displaying it in an image view or saving it to a file.
+
+        // Display or save the extracted LUT channels image as needed
+        opImgView.image = outputUIImage
     }
     
     func colorTransfer() {
